@@ -118,7 +118,12 @@ translator = Translator()  # Создаем экземпляр Translator
 @dp.message(F.text)
 async def translate(message: Message):
     text = message.text
-    translation = translator.translate(text, dest='en')
+    detected_lang = translator.detect(text).lang # Определяем язык текста
+    if detected_lang == 'ru':
+        dest_lang = 'en'
+    else:
+        dest_lang = 'ru'
+    translation = translator.translate(text, dest=dest_lang)
     await message.answer(translation.text)
 
 # @dp.message()
