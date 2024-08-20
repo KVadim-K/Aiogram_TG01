@@ -1,15 +1,16 @@
 import asyncio
-from aiogram import Bot, Dispatcher, F
-from aiogram.filters import CommandStart, Command
-from aiogram.types import Message, FSInputFile
-from googletrans import Translator
-import requests
-import random
-from gtts import gTTS
 import os
+import random
 
+import requests
+from aiogram import Bot, Dispatcher, F
+from aiogram.filters import Command
+from aiogram.types import Message, FSInputFile, CallbackQuery
+from googletrans import Translator
+from gtts import gTTS
+
+import keyboard as kb
 from config import TOKEN, API_KEY
-
 
 bot = Bot(token=TOKEN)
 dp = Dispatcher()
@@ -109,9 +110,82 @@ async def weather(message: Message):
 @dp.message(Command('help'))
 async def help(message: Message):
     await message.answer("Этот бот умеет выполнять команды:\n/start \n/help \n/photo \n/weather \n/voice \n/video \n/doc \n/training")
-@dp.message(CommandStart())
+
+# @dp.message(CommandStart())
+# async def start(message: Message):
+#     await message.answer(f'Привет, {message.from_user.full_name}', reply_markup=kb.inline_keyboard_test)  # Клавиатура kb.main для reply кнопки/ kb.inline_keyboard_test для inline кнопки/ await kb.test_keyboard() для Builder кнопок
+
+@dp.message(Command('start'))
 async def start(message: Message):
+    await message.answer(f'Здравствуй, {message.from_user.full_name}', reply_markup=kb.inline_keyboard_start)
+
+@dp.message(Command('links'))
+async def links(message: Message):
+    await message.answer(f'Привет, {message.from_user.full_name}', reply_markup=kb.inline_keyboard_links)
+
+@dp.message(Command('dynamic'))
+async def dynamic(message: Message):
+    await message.answer(f'Привет, {message.from_user.full_name}', reply_markup=kb.inline_keyboard_dynamic)
+
+@dp.callback_query(F.data == 'hello')  # обработка нажатия на кнопку
+async def hello(callback: CallbackQuery):
+    await callback.answer("Готовлю ответ")
+    await callback.message.answer(f'Здравствуйте!!!, {callback.from_user.full_name}')
+
+@dp.callback_query(F.data == 'bay')  # обработка нажатия на кнопку
+async def hello(callback: CallbackQuery):
+    await callback.answer("Готовлю ответ")
+    await callback.message.answer(f'До свидания!!!, {callback.from_user.full_name}')
+
+@dp.callback_query(F.data == 'option_1')  # обработка нажатия на кнопку
+async def option_1(callback: CallbackQuery):
+    await callback.answer("Готовлю ответ")
+    await callback.message.edit_text(f'До свидания!!!, {callback.from_user.full_name}')
+
+@dp.callback_query(F.data == 'option_2')  # обработка нажатия на кнопку
+async def option_2(callback: CallbackQuery):
+    await callback.answer("Готовлю ответ")
+    await callback.message.edit_text(f'До свидания!!!, {callback.from_user.full_name}')
+
+@dp.callback_query(F.data == 'video')  # обработка нажатия на кнопку
+async def video(callback: CallbackQuery):
+    await callback.answer("Видео подгружаются")  # всплывающий ответ бота. show_alert=True - всплывающее окно
+    await callback.message.answer("Новое видео")
+    # await callback.message.answer("https://yandex.ru/news/")
+
+@dp.callback_query(F.data == 'music')  # обработка нажатия на кнопку
+async def music(callback: CallbackQuery):
+    await callback.answer("Музыка подгружаются")  # всплывающий ответ бота. show_alert=True - всплывающее окно
+    await callback.message.answer("Хорошая музыка")
+    # await callback.message.answer("https://yandex.ru/news/")
+
+@dp.callback_query(F.data == 'news')  # обработка нажатия на кнопку
+async def news(callback: CallbackQuery):
+    await callback.answer("Новости подгружаются")  # всплывающий ответ бота. show_alert=True - всплывающее окно
+    await callback.message.edit_text("Свежая новость", reply_markup=await kb.test_keyboard())  # обновление сообщения: меняем answer на edit_text и добавляем: reply_markup=await kb.test_keyboard() и убираем старую ссылку ниже.
+    # await callback.message.answer("https://yandex.ru/news/")
+
+@dp.callback_query(F.data == 'show_more')  # обработка нажатия на кнопку
+async def show_more(callback: CallbackQuery):
+    await callback.answer("Сейчас подгрузится")  # всплывающий ответ бота. show_alert=True - всплывающее окно
+    await callback.message.edit_text("Подгружаю еще", reply_markup=await kb.dynamic_keyboard())  # обновление сообщения: меняем answer на edit_text и добавляем: reply_markup=await kb.test_keyboard() и убираем старую ссылку ниже.
+    # await callback.message.answer("https://yandex.ru/weather/")
+
+# @dp.callback_query(F.data == 'option')  # обработка нажатия на кнопку
+# async def option(callback: CallbackQuery):
+#     await callback.answer("Сейчас подгрузится")  # всплывающий ответ бота. show_alert=True - всплывающее окно
+#     await callback.message.edit_text("Подгружаю Опция 1", reply_markup=await kb.options_keyboard())  # обновление сообщения: меняем answer на edit_text и добавляем: reply_markup=await kb.test_keyboard() и убираем старую ссылку ниже.
+#     # await callback.message.answer("https://yandex.ru/weather/")
+
+
+@dp.message(F.text == "Привет")
+async def test_button(message: Message):
     await message.answer(f'Привет, {message.from_user.full_name}')
+
+@dp.message(F.text == "Пока")
+async def test_button(message: Message):
+    await message.answer(f'До свидания, {message.from_user.full_name}')
+
 
 translator = Translator()  # Создаем экземпляр Translator
 
