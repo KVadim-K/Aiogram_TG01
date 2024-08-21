@@ -142,10 +142,12 @@ async def option_1(callback: CallbackQuery):
     await callback.answer("Готовлю ответ")
     await callback.message.edit_text(f'До свидания!!!, {callback.from_user.full_name}')
 
-@dp.callback_query(F.data == 'option_2')  # обработка нажатия на кнопку
-async def option_2(callback: CallbackQuery):
-    await callback.answer("Готовлю ответ")
-    await callback.message.edit_text(f'До свидания!!!, {callback.from_user.full_name}')
+@dp.message(F.text == 'Опция 1')  # обработка нажатия на кнопку
+async def option_1(message: Message):
+    await message.answer("Готовлю ответ")
+@dp.message(F.text == 'Опция 2')  # обработка нажатия на кнопку
+async def option_2(message: Message):
+    await message.answer("Готовлю ответ")
 
 @dp.callback_query(F.data == 'video')  # обработка нажатия на кнопку
 async def video(callback: CallbackQuery):
@@ -171,11 +173,11 @@ async def show_more(callback: CallbackQuery):
     await callback.message.edit_text("Подгружаю еще", reply_markup=await kb.dynamic_keyboard())  # обновление сообщения: меняем answer на edit_text и добавляем: reply_markup=await kb.test_keyboard() и убираем старую ссылку ниже.
     # await callback.message.answer("https://yandex.ru/weather/")
 
-# @dp.callback_query(F.data == 'option')  # обработка нажатия на кнопку
-# async def option(callback: CallbackQuery):
-#     await callback.answer("Сейчас подгрузится")  # всплывающий ответ бота. show_alert=True - всплывающее окно
-#     await callback.message.edit_text("Подгружаю Опция 1", reply_markup=await kb.options_keyboard())  # обновление сообщения: меняем answer на edit_text и добавляем: reply_markup=await kb.test_keyboard() и убираем старую ссылку ниже.
-#     # await callback.message.answer("https://yandex.ru/weather/")
+@dp.callback_query(F.data == 'option')  # обработка нажатия на кнопку
+async def option(callback: CallbackQuery):
+    await callback.answer("Почти подгрузилось")  # всплывающий ответ бота. show_alert=True - всплывающее окно
+    await callback.message.edit_text("Подгружаю Опция 1", reply_markup=await kb.options_keyboard())  # обновление сообщения: меняем answer на edit_text и добавляем: reply_markup=await kb.test_keyboard() и убираем старую ссылку ниже.
+    # await callback.message.answer("https://yandex.ru/weather/")
 
 
 @dp.message(F.text == "Привет")
