@@ -35,8 +35,7 @@ async def send_welcome(message: Message):
 
     # Создаем инлайн-клавиатуру с тремя кнопками
     keyboard = InlineKeyboardMarkup(inline_keyboard=[
-        [InlineKeyboardButton(text="Да", callback_data="yes")],
-        [InlineKeyboardButton(text="Нет", callback_data="no")],
+        [InlineKeyboardButton(text="Да", callback_data="yes"),InlineKeyboardButton(text="Нет", callback_data="no")],
         [InlineKeyboardButton(text="Может быть", callback_data="maybe")]
     ])
 
