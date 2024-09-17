@@ -20,22 +20,26 @@ dp = Dispatcher()
 
 logging.basicConfig(level=logging.INFO)
 
-button_registr = KeyboardButton(text="Регистрация в телеграм боте")
+# cоздаем кнопки
+button_registr = KeyboardButton(text="Регистрация в телеграм боте")  # cоздаем кнопки
 button_exchange_rates = KeyboardButton(text="Курс валют")
 button_tips = KeyboardButton(text="Советы по экономии")
 button_finances = KeyboardButton(text="Личные финансы")
 
+# создаем клавиатуру
 keyboards = ReplyKeyboardMarkup(keyboard=[
    [button_registr, button_exchange_rates],
    [button_tips, button_finances]
    ], resize_keyboard=True)
 
+# создаем базу данных
 conn = sqlite3.connect('user.db')
 cursor = conn.cursor()
 
+# создаем таблицу
 cursor.execute('''
 CREATE TABLE IF NOT EXISTS users (
-   id INTEGER PRIMARY KEY,
+   id INTEGER PRIMARY KEY AUTOINCREMENT,
    telegram_id INTEGER UNIQUE,
    name TEXT,
    category1 TEXT,
@@ -46,9 +50,9 @@ CREATE TABLE IF NOT EXISTS users (
    expenses3 REAL  
    )
 ''')
-
+# заполняем таблицу
 conn.commit()
-
+# создаем состояния для личных финансов
 class FinancesForm(StatesGroup):
     category1 = State()
     expenses1 = State()
@@ -57,11 +61,11 @@ class FinancesForm(StatesGroup):
     category3 = State()
     expenses3 = State()
 
-
+# обрабатываем команду /start
 @dp.message(Command('start'))
 async def send_start(message: Message):
     await message.answer("Привет! Я ваш личный финансовый помощник. Выберите одну из опций в меню:", reply_markup=keyboards)
-
+# обрабатываем команду /registration
 @dp.message(F.text == "Регистрация в телеграм боте")
 async def registration(message: Message):
     telegram_id = message.from_user.id
@@ -74,7 +78,7 @@ async def registration(message: Message):
         cursor.execute('''INSERT INTO users (telegram_id, name) VALUES (?, ?)''', (telegram_id, name))
         conn.commit()
         await message.answer("Вы успешно зарегистрированы!")
-
+# обрабатываем команду /exchange_rates
 @dp.message(F.text == "Курс валют")
 async def exchange_rates(message: Message):
     url = "https://v6.exchangerate-api.com/v6/0fafad8958c3ad115d93657a/latest/USD"
@@ -93,7 +97,7 @@ async def exchange_rates(message: Message):
                              f"1 EUR - {euro_to_rub:.2f}  RUB")
     except:
         await message.answer("Произошла ошибка")
-
+# обрабатываем команду /tips
 @dp.message(F.text == "Советы по экономии")
 async def send_tips(message: Message):
     tips = [
@@ -103,42 +107,42 @@ async def send_tips(message: Message):
     ]
     tip = random.choice(tips)
     await message.answer(tip)
-
+# обрабатываем команду /finances
 @dp.message(F.text == "Личные финансы")
 async def finances(message: Message, state: FSMContext):
     await state.set_state(FinancesForm.category1)
     await message.reply("Введите первую категорию расходов:")
-
+# обрабатываем первую категорию расходов
 @dp.message(FinancesForm.category1)
 async def finances(message: Message, state: FSMContext):
     await state.update_data(category1=message.text)
     await state.set_state(FinancesForm.expenses1)
     await message.reply("Введите расходы для категории 1:")
-
+# обрабатываем расходы для первой категории
 @dp.message(FinancesForm.expenses1)
 async def finances(message: Message, state: FSMContext):
     await state.update_data(expenses1=float(message.text))
     await state.set_state(FinancesForm.category2)
     await message.reply("Введите вторую категорию расходов:")
-
+# обрабатываем вторую категорию расходов
 @dp.message(FinancesForm.category2)
 async def finances(message: Message, state: FSMContext):
     await state.update_data(category2=message.text)
     await state.set_state(FinancesForm.expenses2)
     await message.reply("Введите расходы для категории 2:")
-
+# обрабатываем расходы для второй категории
 @dp.message(FinancesForm.expenses2)
 async def finances(message: Message, state: FSMContext):
     await state.update_data(expenses2=float(message.text))
     await state.set_state(FinancesForm.category3)
     await message.reply("Введите третью категорию расходов:")
-
+#    обрабатываем третью категорию расходов
 @dp.message(FinancesForm.category3)
 async def finances(message: Message, state: FSMContext):
     await state.update_data(category3=message.text)
     await state.set_state(FinancesForm.expenses3)
     await message.reply("Введите расходы для категории 3:")
-
+# обрабатываем расходы для третей категории
 @dp.message(FinancesForm.expenses3)
 async def finances(message: Message, state: FSMContext):
     data = await state.get_data()
@@ -151,6 +155,8 @@ async def finances(message: Message, state: FSMContext):
 
     await message.answer("Категории и расходы сохранены!")
 
+
+# запускаем бота
 async def main():
     await dp.start_polling(bot)
 
