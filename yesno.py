@@ -11,7 +11,7 @@ logging.basicConfig(level=logging.INFO)
 bot = Bot(token=TOKEN)
 dp = Dispatcher()
 
-
+# Тест подключения к API webhook!!!
 async def get_yes_no(force_choice=None):
     url = 'https://yesno.wtf/api'
     if force_choice in ["yes", "no", "maybe"]:
